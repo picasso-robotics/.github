@@ -39,7 +39,7 @@
 | [picasso-robotics/factory-runtime](https://github.com/picasso-robotics/factory-runtime) | picasso 라이브러리의 포트를 실제 로봇·PLC·AMR 드라이버에 배선해 신규 공장에 배포하는 실행 프로세스의 자리. 아직 커밋이 없다 | — |
 
 저장소별 최근 완료, 다음 작업, 어떤 조건에서 무엇을 미루는지, 설계상 하지 않는 것은 [ROADMAP.md](https://github.com/picasso-robotics/.github/blob/main/ROADMAP.md)에 있습니다.
-저장소들이 2026-11-10 에 이 조직으로 옮기며 이름이 바뀌었고, 각 저장소 문서는 새 이름을 쓰지만 기록과 빌드·패키지 이름, `incident-recovery` 의 프로젝트 이름(`koshchei`)에는 옛 이름이 남아 있습니다.
+저장소들이 2026-11-10에 이 조직으로 옮기며 이름이 바뀌었고, 각 저장소의 문서와 빌드 이름은 새 이름을 쓰지만 기록과 `incident-recovery`의 프로젝트 이름(`koshchei`)에는 옛 이름이 남아 있습니다.
 
 ---
 
