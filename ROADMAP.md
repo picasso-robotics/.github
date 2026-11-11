@@ -12,7 +12,7 @@
 
 이 조직의 어떤 소프트웨어도 실제 로봇·PLC·상용 MES 에 연결된 적이 없다. picasso 의 어댑터 넷 중 어느 것도 실제 하드웨어에 붙여 보지 못했다(한계 C-3). 로봇은 에뮬레이터 `mimic`, 설비는 셀 대역, 상위 시스템은 로컬 Mock MES 다. 각 항목은 근거 문서로 연결되고, 연결된 문서의 수치와 이 문서가 다를 때는 연결된 문서가 우선한다.
 
-2026-11-10 에 저장소들이 개인 계정에서 이 조직으로 옮겨 오며 이름이 바뀌었다. 각 저장소 문서 안에는 아직 옛 이름이 남아 있다 — `mission-ops` 는 `picasso-ops`, `incident-narrator` 는 `picasso-narrator`, `incident-recovery` 는 `koshchei`(그 이전 저장소 이름은 `koshei`). 이 문서는 조직의 저장소 이름을 쓴다.
+2026-11-10 에 저장소들이 개인 계정에서 조직으로 옮기며 이름이 바뀌었다. `picasso`, `mission-ops`, `incident-narrator` 세 저장소 문서는 2026-11-11 에 새 이름을 반영했으나 기록과 빌드·패키지 이름은 옛 이름이고, `incident-recovery` 의 프로젝트·패키지 이름은 `koshchei` 이다. 이 문서는 조직의 저장소 이름을 쓴다.
 
 ## 제품 간 경계
 
@@ -28,8 +28,6 @@
 
 ## 지금 진행 중인 흐름
 
-- 문서 속 저장소 이름 반영: URL 은 이미 조직 주소로 바꿨고(2026-11-10), 링크 글자와 본문 속 옛 이름은 남아 있다. 저장소마다 바꿀 자리 목록을 먼저 확인받고 PR 하나씩 올린다. ADR·변경 이력·계획 문서 같은 기록은 바꾸지 않는다. 미착수.
-- `mission-ops` 의 picasso 서브모듈 올리기: 지금 고정 커밋은 `3b5d6c5`(2026-11-02)이고 이 커밋의 카탈로그는 Testcontainers 1.20.4 다. 그래서 CI 의 gradle 작업을 `ubuntu-24.04` 로 고정해 두었다(2026-11-10). Testcontainers 1.21.4 이후의 picasso 로 올릴 때 `ubuntu-latest` 로 되돌린다. 미착수.
 - `incident-narrator` 측정 기준선 이동: 측정 기준선은 계약 0.9.0 / 내보내기 schema 5 픽스처에 있고, 0.10.0 세트는 픽스처로 들어와 있다. 다음 실측 때 0.10.0 으로 옮긴다.
 
 ## 제품별 로드맵
@@ -54,6 +52,7 @@
 - 계약 0.10.0 `FaultObservability` (2026-11-05).
 - 한계 레지스터 항목 닫기: Orbit CLI와 주기 재탐색, MQTT 관측 구독기, 다이제스트 범위, 관측 불가 원장에서 게이트 검사 6 ERROR, 보존 상한, adapter-host 세션 nonce (2026-11-07).
 - 조직 이전과 README 주소 갱신 (2026-11-10).
+- 문서 속 저장소 이름 반영: 링크 글자와 본문 속 이름을 새 이름으로 바꿈 (2026-11-11).
 
 **지금·다음**
 - 열린 PR 은 없다.
@@ -76,6 +75,8 @@
 상위 시스템(MES/WMS)의 외부 작업 지시를 로봇 미션으로 연결하고 작업 요청·실행·결과 회신의 전체 흐름을 운영하는 PoC 다. picasso 위에 있다. 모듈: `ui`(React/Vite 운영 화면), `ops-service`(운영 API, 외부 작업 지시 계약, 영속 작업 요청·결과·ACK, 공유 스테이션 조정), `mission-host`(picasso 를 쓰는 실행 호스트: 미션 검증, 모의 실행, 실행 복원), `site`(registry·mimic·셀 대역을 띄우는 로컬 사이트 런처), `e2e`(통합 시험), `load`(부하 측정 하네스, 빌드와 CI 밖). Kotlin, Spring Boot, JDK 21, Postgres, UI 는 Node 22 다.
 
 **최근 완료**
+- 서브모듈 올림: `picasso` 서브모듈을 `3b5d6c5` 에서 `51d8230` 으로 올림, 계약 0.10.0 에 맞춰 시험 기대값 갱신, `site` 런처가 레지스트리 링크 비우기를 잠금 밖에서 하도록 고침, CI gradle 작업을 `ubuntu-latest` 로 되돌림 (2026-11-11).
+- 문서 정비: `docs/reference.md` 의 재작업 폼 설명을 지금 동작에 맞추고 `README` 복제 경로를 `cd mission-ops` 로 정정, 문서의 링크 글자와 본문 속 이름을 새 이름으로 바꿈 (2026-11-11).
 - 조직 이전: 서브모듈 URL·문서 링크를 조직 주소로 바꿈, CI gradle 작업을 `ubuntu-24.04` 로 고정 (2026-11-10).
 - 퇴역 로봇에 새 명령 막기: registry 진단 읽기(`RetirementPort`)와 `GET /host/retirements` (2026-11-02).
 - picasso 서브모듈을 `3b5d6c5` 까지 올림 (2026-11-02).
@@ -90,7 +91,6 @@
 - 실행 상태 버전은 확정 후보이며 열 이름은 아직 없다.
 - 남은 부하 지점(호스트 pump 스캔, 키워드 검색 목록, 미확인 결과 목록의 나머지)을 먼저 고치고 로봇을 늘리며 잰다.
 - 하트비트 값(주기 5초, 만료 30초, 실측 없음)을 하네스 뒤에 다시 정한다.
-- 위 「지금 진행 중인 흐름」의 서브모듈 올리기와 CI 러너 되돌리기.
 
 **보류 (재개 조건)**
 - 2단계 분할: 단일 활성 구성이 측정한 수치를 못 버틸 때 연다.
@@ -121,6 +121,7 @@ picasso 아래에 있는 LLM 설명 계층 PoC 다. picasso 가 이미 판정한
 - Apache License 2.0 (2026-10-18).
 - picasso 계약 0.10.0 픽스처와 시험 (2026-11-05).
 - 조직 이전 (2026-11-10).
+- 문서 속 저장소 이름 반영: 링크 글자와 본문 속 이름을 새 이름으로 바꿈 (2026-11-11).
 
 **지금·다음**
 - 프로덕션 `search_text` 의 효과를 다시 잰다. 측정 도구는 아직 옛 요청을 보내며, 기준선을 옮길지는 다음 측정 설계 문서가 정한다. [STATE.md](https://github.com/picasso-robotics/incident-narrator/blob/main/STATE.md)
@@ -148,6 +149,7 @@ picasso 아래에 있는 LLM 설명 계층 PoC 다. picasso 가 이미 판정한
 - README 한국어판(영어판은 `README.en.md`), 번들·에피소드 예시와 그림 (2026-10-06).
 - 번들 읽기와 진단 스냅숏이 picasso 내보내기 schema 6 을 받음 (2026-11-05).
 - 예시를 picasso 최신 main 으로 갱신, 설계 문서와 KDoc 정정 (2026-11-05).
+- Testcontainers 올림: Testcontainers 를 1.21.4 로 올려 Docker Engine 29 에서 시험이 돎 (2026-11-11).
 
 **지금·다음** (설계 문서 §16·§19, [2026-09-27-episode-outer-loop-design.md](https://github.com/picasso-robotics/incident-recovery/blob/main/docs/design/2026-09-27-episode-outer-loop-design.md))
 - 명시된 다음 목록은 없다. 계획 C 에 남은 것: 현재 시각 기준 `revalidate`(실시간 원장 읽기 필요), 「분명히 보내지 않음」을 코어에 알리기, 드리프트 입력, DONE 의 뜻.
@@ -181,7 +183,7 @@ picasso 라이브러리의 포트를 실제 로봇·PLC·AMR 드라이버에 배
   - `unknowns.what` 열거값.
   - `PROPOSAL_CHANGED` 를 재진단 목록에 넣을지.
 - `APPROVE_REMEDY` 자동 승인 다시 켜기: 세 조건이 성립한 뒤 사용자가 정한다(`incident-narrator` 와 `incident-recovery` 문서 양쪽에 적혀 있다).
-- 빌드 이름: 저장소 이름 반영 때 `mission-ops` 의 `rootProject.name = "picasso-ops"` 와 `incident-narrator` 의 `pyproject.toml` `name = "picasso-narrator"` 를 바꿀지는 따로 정한다(빌드 산출물 이름, CI 캐시 키, Python 패키지 이름이 바뀐다).
+- 빌드 이름 변경: 2026-11-11 이름 반영 때 `mission-ops` 의 `rootProject.name = "picasso-ops"` 와 `incident-narrator` 의 `pyproject.toml` `name = "picasso-narrator"` 는 그대로 두었으며, 바꾸면 빌드 산출물 이름·CI 캐시 키·Python 패키지 이름이 바뀌므로 바꿀지 따로 정한다.
 - picasso 와 `mission-ops` 에는 소유자 결정을 기다리는 항목이 적혀 있지 않다.
 
 ## 이 문서의 갱신
