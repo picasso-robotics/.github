@@ -12,7 +12,7 @@
 
 이 조직의 어떤 소프트웨어도 실제 로봇·PLC·상용 MES 에 연결된 적이 없다. picasso 의 어댑터 넷 중 어느 것도 실제 하드웨어에 붙여 보지 못했다(한계 C-3). 로봇은 에뮬레이터 `mimic`, 설비는 셀 대역, 상위 시스템은 로컬 Mock MES 다. 각 항목은 근거 문서로 연결되고, 연결된 문서의 수치와 이 문서가 다를 때는 연결된 문서가 우선한다.
 
-2026-11-10에 저장소들이 개인 계정에서 조직으로 옮기며 이름이 바뀌었다. 세 저장소(`picasso`, `mission-ops`, `incident-narrator`)의 문서와 빌드 이름은 2026-11-11에 새 이름으로 바꿨고 기록은 옛 이름 그대로이며, `incident-recovery`의 프로젝트와 Kotlin 패키지 이름은 아직 `koshchei`다. 이 문서는 조직의 저장소 이름을 쓴다.
+2026-11-10에 저장소들이 개인 계정에서 조직으로 옮기며 `picasso-ops`는 `mission-ops`, `picasso-narrator`는 `incident-narrator`, `koshchei`는 `incident-recovery`로 이름이 바뀌었다. 2026-11-11에는 네 저장소(`picasso`, `mission-ops`, `incident-narrator`, `incident-recovery`)의 문서·빌드·코드 이름을 새 이름으로 바꿨고, 옛 이름은 기록(옛 PR·커밋 인용, ADR, 변경 이력, 계획 문서, 편지)에만 남는다. 이 문서는 조직의 저장소 이름을 쓴다.
 
 ## 제품 간 경계
 
@@ -152,6 +152,7 @@ picasso 아래에 있는 LLM 설명 계층 PoC 다. picasso 가 이미 판정한
 - 번들 읽기와 진단 스냅숏이 picasso 내보내기 schema 6 을 받음 (2026-11-05).
 - 예시를 picasso 최신 main 으로 갱신, 설계 문서와 KDoc 정정 (2026-11-05).
 - Testcontainers 올림: Testcontainers 를 1.21.4 로 올려 Docker Engine 29 에서 시험이 돎 (2026-11-11).
+- 이름 변경: 패키지 `dev.picasso.recovery.*`, 환경 변수 `RECOVERY_*`, 작업 큐 `incident-recovery-episode-tq`, 데이터베이스 `incident_recovery`, 헤더 `X-Recovery-Operator` 변경, 외부 계약 이름과 동작 유지, 이전 데이터베이스 옮기지 않음, 실제 Temporal과 `picasso` 참조 승인 호스트로 승인부터 결과 통보까지 다시 돌려 확인 (2026-11-11).
 
 **지금·다음** (설계 문서 §16·§19, [2026-09-27-episode-outer-loop-design.md](https://github.com/picasso-robotics/incident-recovery/blob/main/docs/design/2026-09-27-episode-outer-loop-design.md))
 - 명시된 다음 목록은 없다. 계획 C 에 남은 것: 현재 시각 기준 `revalidate`(실시간 원장 읽기 필요), 「분명히 보내지 않음」을 코어에 알리기, 드리프트 입력, DONE 의 뜻.
