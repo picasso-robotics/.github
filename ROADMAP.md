@@ -75,6 +75,7 @@
 상위 시스템(MES/WMS)의 외부 작업 지시를 로봇 미션으로 연결하고 작업 요청·실행·결과 회신의 전체 흐름을 운영하는 PoC 다. picasso 위에 있다. 모듈: `ui`(React/Vite 운영 화면), `ops-service`(운영 API, 외부 작업 지시 계약, 영속 작업 요청·결과·ACK, 공유 스테이션 조정), `mission-host`(picasso 를 쓰는 실행 호스트: 미션 검증, 모의 실행, 실행 복원), `site`(registry·mimic·셀 대역을 띄우는 로컬 사이트 런처), `e2e`(통합 시험), `load`(부하 측정 하네스, 빌드와 CI 밖). Kotlin, Spring Boot, JDK 21, Postgres, UI 는 Node 22 다.
 
 **최근 완료**
+- 기체 상태 미리 읽기: 실행 호스트 기본 기체 포트를 picasso `IssuingRobotPort`(출발·취소를 잠금 밖에서 보냄)와 `PrefetchingRobotPort`(기체 상태를 잠금 밖에서 미리 읽음)로 감싼 `HostRobotPort`로 변경(picasso 코드 변경 없음), 쓸 미리 읽기가 없을 때와 출발을 앞둔 기체는 지금 읽어 출발 관문이 한 라운드 앞의 값으로 결함을 놓치지 않게 조치, 기체 200에서 일하는 pump p95 329에서 106 ms로 감소(주기 250 ms 안) (2026-11-12).
 - 부하 지점 수정과 기체 늘려 재기: 작업 요청 검색에 trigram 인덱스(V24, `pg_trgm`) 추가, 실행 호스트 pump의 기록 문장을 합쳐 pump당 DB 문장 약 42% 감소, 하네스에 기체 100·200 시나리오(`pumpscale`)와 벽시계 표본기 추가, 실측에 따라 수신 미확인 집계 질의와 심장박동 주기(5초·만료 30초) 유지 (2026-11-11).
 - 빌드 이름 변경: `rootProject.name`을 `mission-ops`로 변경 (2026-11-11).
 - 서브모듈 올림: `picasso` 서브모듈을 `3b5d6c5` 에서 `51d8230` 으로 올림, 계약 0.10.0 에 맞춰 시험 기대값 갱신, `site` 런처가 레지스트리 링크 비우기를 잠금 밖에서 하도록 고침, CI gradle 작업을 `ubuntu-latest` 로 되돌림 (2026-11-11).
@@ -91,7 +92,7 @@
 **지금·다음** (HA 권한 설계 명세, [2026-10-14-ha-authority-design.md](https://github.com/picasso-robotics/mission-ops/blob/main/docs/superpowers/specs/2026-10-14-ha-authority-design.md))
 - `restore()` 와 잔여 상태 검사의 세대 비교를 1단계로 옮긴다.
 - 실행 상태 버전은 확정 후보이며 열 이름은 아직 없다.
-- 기체 200에서 일하는 pump p95가 425 ms로 주기 250 ms를 넘으며, 다음 병목은 `picasso` `Middleware.sync`(기체마다의 상태 읽기)와 응답마다의 기록 문장이다.
+- 기체 200에서 일하는 pump p95가 106 ms로 주기 250 ms 안에 들었으나 벽시계로 도는 운영에서의 이득은 재지 않았고, 다음 병목은 응답마다의 기록 문장(`appendResult` 등)이다.
 
 **보류 (재개 조건)**
 - 2단계 분할: 단일 활성 구성이 측정한 수치를 못 버틸 때 연다.
