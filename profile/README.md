@@ -19,6 +19,7 @@
 `mission-ops`는 고정 커밋의 `picasso`를 git 서브모듈로 라이브러리처럼 씁니다.
 `incident-narrator`와 `incident-recovery`는 `picasso`가 내보낸 파일인 **인시던트 번들**(incident bundle)과 **작업 응답**(`JobResponse`), 승인 엔드포인트, 진단 계약으로만 연결됩니다.
 `picasso`는 `incident-narrator`를 부르지 않습니다.
+**한 저장소의 작업은 다른 저장소의 파일을 직접 만들거나 고치지 않습니다.** 넘길 것은 내는 쪽 저장소의 `handoff/<받는 쪽>/`(`incident-narrator`는 `correspondence/`)에 두고 경로만 알리며, 무엇을 언제 반입할지는 받는 쪽이 정합니다. 다른 저장소를 읽는 것은 막지 않습니다.
 공유 계약은 `picasso` 계약 버전 0.10.0, 내보내기 `schemaVersion` 6, 승인 엔드포인트 버전 4, 진단 계약 0.6입니다.
 
 > **검증 범위**: 이 조직의 어떤 소프트웨어도 실제 로봇·PLC·상용 MES 에 연결한 적이 없습니다.
@@ -62,7 +63,7 @@
 
 ## 3. 기술 스택
 
-- `picasso`: Kotlin, Gradle, JDK 21, 모듈 16개. 명령·조회는 gRPC, 상태·이벤트·스트리밍은 MQTT.
+- `picasso`: Kotlin, Gradle, JDK 21, 모듈 17개. 명령·조회는 gRPC, 상태·이벤트·스트리밍은 MQTT.
 - `mission-ops`: Kotlin, Spring Boot, JDK 21, PostgreSQL, React/Vite UI(Node 22).
 - `incident-recovery`: Kotlin, JDK 21, Temporal, Spring Boot API, Vite/React UI.
 - `incident-narrator`: Python 3.11 이상, Temporal 워커, 외부 Khala/Nexus 검색·인용 검증 서비스.
