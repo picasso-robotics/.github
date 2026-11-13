@@ -1,0 +1,13 @@
+# 이 저장소의 PR 에도 공개 전 검사를 건다(다른 저장소가 쓰는 것과 같은 모양).
+name: publication
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  publication:
+    uses: ./.github/workflows/publication-check.yml

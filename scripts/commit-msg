@@ -1,0 +1,6 @@
+#!/bin/sh
+# 로컬 commit-msg 훅 — 커밋 메시지를 공개 전 검사로 훑는다(CONTRIBUTING.md «로컬에서 막기»).
+# 설치: 이 파일을 각 저장소의 .git/hooks/commit-msg 로 복사하고 실행 권한을 준다.
+#       ORG_GITHUB 에 picasso-robotics/.github 클론 경로를 둔다(기본은 저장소 옆의 ../.github).
+ORG_GITHUB="${ORG_GITHUB:-$(git rev-parse --show-toplevel)/../.github}"
+exec python3 "$ORG_GITHUB/scripts/publication_check.py" "$1"

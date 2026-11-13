@@ -1,0 +1,21 @@
+# 이 저장소의 검사 스크립트가 잡을 것을 잡는지 댄다. 규칙을 고치는 PR 마다 돈다.
+name: self-test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Scan this repository's own files
+        run: python3 scripts/publication_check.py $(git ls-files '*.md' '*.yml' '*.py')
