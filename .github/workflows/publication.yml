@@ -11,5 +11,3 @@ permissions:
 jobs:
   publication:
     uses: ./.github/workflows/publication-check.yml
-    secrets:
-      PUBLICATION_DENYLIST: ${{ secrets.PUBLICATION_DENYLIST }}

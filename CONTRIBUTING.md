@@ -86,8 +86,8 @@ Co-Authored-By: <이름> <user@example.com>
 3. **GitHub**
    - 저장소마다 Secret scanning과 Push protection을 켠다(공개 저장소는 무료다).
    - 기본 브랜치는 PR 제출과 검사 통과를 필수로 요구한다.
-   - org 고유 금지어(고객·현장 이름, 내부 호스트)는 이 공개 저장소에 적지 않는다. 목록 자체가 유출이다.
-   - org 비밀 `PUBLICATION_DENYLIST`(한 줄에 정규식 하나)로 두고 워크플로가 읽게 한다.
+   - org 고유 금칙어(고객·현장 이름, 내부 호스트)는 이 공개 저장소에도 CI 에도 두지 않는다. 목록 자체가 유출이다.
+   - 각자 PC 의 로컬 파일 `~/.config/picasso-robotics/publication-denylist.txt`(한 줄에 정규식 하나, `#` 은 주석)에만 두고 로컬 검사가 읽는다. 다른 자리면 환경 변수 `PUBLICATION_DENYLIST_FILE` 로 가리킨다. 걸리면 줄 번호만 출력한다.
    - 검사가 잘못 걸리면 규칙을 고치는 PR을 낸다(`scripts/test_publication_check.py`에 시험을 더한다). 개별 PR에서 검사를 끄지 않는다.
 
 ## 사고 대응

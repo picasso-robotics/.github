@@ -11,8 +11,9 @@
 #   jobs:
 #     publication:
 #       uses: picasso-robotics/.github/.github/workflows/publication-check.yml@main
-#       secrets:
-#         PUBLICATION_DENYLIST: ${{ secrets.PUBLICATION_DENYLIST }}
+#
+# org 고유 금칙어(고객·현장 이름 등)는 CI 에 두지 않는다 — 각자 PC 의 로컬 파일에만 두고 로컬 검사가 읽는다(CONTRIBUTING.md).
+# 그래서 이 검사는 일반 규칙(비밀·로컬 경로·개인 메일 등)만 돈다.
 #
 # 주의: PR 본문은 올린 순간 공개되고, 고쳐도 이전 판이 «edited» 기록으로 남는다. 이 검사는 병합을 막을 뿐 본문 유출은 못 막는다 —
 # 본문은 올리기 전에 로컬에서 같은 스크립트로 훑는다(CONTRIBUTING.md).
@@ -20,10 +21,6 @@ name: publication-check
 
 on:
   workflow_call:
-    secrets:
-      PUBLICATION_DENYLIST:
-        description: "org 고유 금지어 정규식, 한 줄에 하나. 공개 파일에 적지 않는다."
-        required: false
 
 permissions:
   contents: read
@@ -56,6 +53,4 @@ jobs:
           git -C repo diff --unified=0 "$BASE...$HEAD" | grep -E '^\+[^+]' | sed 's/^+//' > added.txt || true
           wc -l pr.txt commits.txt added.txt
       - name: Scan
-        env:
-          PUBLICATION_DENYLIST: ${{ secrets.PUBLICATION_DENYLIST }}
         run: python3 .org/scripts/publication_check.py pr.txt commits.txt added.txt

@@ -4,23 +4,28 @@
 시험용 비밀 값은 진짜가 아니다 — 모양만 맞춘 가짜이고, 일부러 이어 붙여 이 파일이 검사에 걸리지 않게 한다.
 """
 import os
+import tempfile
 import unittest
 
 import publication_check as pc
 
 
 def hits(text, env=None):
-    old = os.environ.get("PUBLICATION_DENYLIST")
-    if env is not None:
-        os.environ["PUBLICATION_DENYLIST"] = env
-    try:
-        return pc.scan("t", text, pc.org_rules())
-    finally:
+    """env 를 주면 그 내용을 임시 로컬 금칙어 파일로 쓰고 읽힌다. 안 주면 없는 파일을 가리켜 기본 규칙만 돈다."""
+    old = os.environ.get("PUBLICATION_DENYLIST_FILE")
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "denylist.txt")
         if env is not None:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(env)
+        os.environ["PUBLICATION_DENYLIST_FILE"] = path
+        try:
+            return pc.scan("t", text, pc.org_rules())
+        finally:
             if old is None:
-                del os.environ["PUBLICATION_DENYLIST"]
+                del os.environ["PUBLICATION_DENYLIST_FILE"]
             else:
-                os.environ["PUBLICATION_DENYLIST"] = old
+                os.environ["PUBLICATION_DENYLIST_FILE"] = old
 
 
 class Catches(unittest.TestCase):
@@ -49,7 +54,7 @@ class Catches(unittest.TestCase):
     def test_personal_email(self):
         self.assertTrue(hits("contact " + "someone" + "@" + "gmail.com"))
 
-    def test_org_denylist_from_env(self):
+    def test_local_denylist_file(self):
         self.assertTrue(hits("Shipped to ACME line 3", env=r"(?i)\bacme\b"))
         self.assertFalse(hits("Shipped to line 3", env=r"(?i)\bacme\b"))
 
@@ -68,6 +73,11 @@ class Passes(unittest.TestCase):
             "public IP 8.8.8.8",
         ]:
             self.assertEqual([], hits(s), s)
+
+    def test_denylist_hit_does_not_print_the_word(self):
+        line = hits("Shipped to ACMECORP line 3", env="# 고객\n(?i)\\bacmecorp\\b\n")[0]
+        self.assertIn("2번 줄", line)
+        self.assertNotIn("acme", line.lower())
 
     def test_mask_hides_value(self):
         line = hits("gh" + "p_" + "a1B2" * 9)[0]

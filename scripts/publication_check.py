@@ -7,8 +7,9 @@
 
 찾으면 `파일:줄: 규칙 — 일치한 조각(가림)` 을 출력하고 종료 코드 1, 없으면 0.
 
-org 고유의 금지어(고객·현장 이름, 내부 호스트 등)는 이 공개 파일에 적지 않는다 — 목록 자체가 유출이다.
-환경 변수 `PUBLICATION_DENYLIST` 에 한 줄에 정규식 하나로 넣는다(org 비밀로 관리).
+org 고유의 금칙어(고객·현장 이름, 내부 호스트 등)는 이 공개 파일에도 CI 에도 두지 않는다 — 목록 자체가 유출이다.
+각자 PC 의 로컬 파일에만 둔다: 기본 자리는 `~/.config/picasso-robotics/publication-denylist.txt`(한 줄에 정규식 하나,
+`#` 로 시작하면 주석), 다른 자리면 환경 변수 `PUBLICATION_DENYLIST_FILE` 로 가리킨다. 파일이 없으면 기본 규칙만 돈다.
 """
 import os
 import re
@@ -36,17 +37,24 @@ EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")
 EMAIL_OK = re.compile(r"(?i)(?:@users\.noreply\.github\.com|^noreply@github\.com|^noreply@anthropic\.com|@example\.(?:com|org|net))$")
 
 
+DEFAULT_DENYLIST = os.path.join("~", ".config", "picasso-robotics", "publication-denylist.txt")
+
+
 def org_rules():
-    raw = os.environ.get("PUBLICATION_DENYLIST", "")
+    path = os.path.expanduser(os.environ.get("PUBLICATION_DENYLIST_FILE") or DEFAULT_DENYLIST)
+    if not os.path.isfile(path):
+        return []
     rules = []
-    for n, line in enumerate(raw.splitlines(), 1):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        try:
-            rules.append((f"org 금지어 {n}", re.compile(line)))
-        except re.error as e:
-            sys.exit(f"PUBLICATION_DENYLIST {n}번 줄의 정규식이 틀렸다: {e}")
+    with open(path, encoding="utf-8") as f:
+        for n, line in enumerate(f.read().splitlines(), 1):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            try:
+                # 출력에는 줄 번호만 보인다 — 금칙어 자체를 출력하면 그 출력이 유출이 된다.
+                rules.append((f"로컬 금칙어 {n}번 줄", re.compile(line)))
+            except re.error as e:
+                sys.exit(f"로컬 금칙어 파일 {n}번 줄의 정규식이 틀렸다: {e}")
     return rules
 
 
@@ -58,9 +66,13 @@ def mask(text):
 def scan(name, text, extra):
     found = []
     for lineno, line in enumerate(text.splitlines(), 1):
-        for rule, rx in RULES + extra:
+        for rule, rx in RULES:
             for m in rx.finditer(line):
                 found.append(f"{name}:{lineno}: {rule} — {mask(m.group(0))}")
+        # 로컬 금칙어는 조각을 하나도 보이지 않는다 — 앞 네 글자만으로도 고객·현장 이름이 드러날 수 있다.
+        for rule, rx in extra:
+            if rx.search(line):
+                found.append(f"{name}:{lineno}: {rule}")
         for m in EMAIL.finditer(line):
             if not EMAIL_OK.search(m.group(0)):
                 found.append(f"{name}:{lineno}: 개인정보: 메일 주소 — {mask(m.group(0))}")
