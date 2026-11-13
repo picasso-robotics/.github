@@ -1,0 +1,61 @@
+# 공개 전 검사(재사용 워크플로) — CONTRIBUTING.md «공개 전 검사» 를 본다.
+#
+# PR 의 제목·본문, PR 에 든 커밋의 메시지와 작성자·커미터 메일, 그리고 PR 이 더한 줄을 scripts/publication_check.py 로 훑는다.
+# 걸리면 실패한다. 각 저장소는 아래처럼 불러 쓴다(.github/workflows/publication.yml):
+#
+#   on:
+#     pull_request:
+#       types: [opened, edited, synchronize, reopened]
+#   permissions:
+#     contents: read
+#   jobs:
+#     publication:
+#       uses: picasso-robotics/.github/.github/workflows/publication-check.yml@main
+#       secrets:
+#         PUBLICATION_DENYLIST: ${{ secrets.PUBLICATION_DENYLIST }}
+#
+# 주의: PR 본문은 올린 순간 공개되고, 고쳐도 이전 판이 «edited» 기록으로 남는다. 이 검사는 병합을 막을 뿐 본문 유출은 못 막는다 —
+# 본문은 올리기 전에 로컬에서 같은 스크립트로 훑는다(CONTRIBUTING.md).
+name: publication-check
+
+on:
+  workflow_call:
+    secrets:
+      PUBLICATION_DENYLIST:
+        description: "org 고유 금지어 정규식, 한 줄에 하나. 공개 파일에 적지 않는다."
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out org scripts
+        uses: actions/checkout@v4
+        with:
+          repository: picasso-robotics/.github
+          path: .org
+      - name: Check out this repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+          fetch-depth: 0
+      - name: Collect PR text, commits and added lines
+        # 제목·본문은 환경 변수로만 넘긴다 — 스크립트 안에 ${{ }} 로 펼치면 본문이 셸 명령으로 실행될 수 있다.
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          printf '%s\n\n%s\n' "$PR_TITLE" "$PR_BODY" > pr.txt
+          git -C repo log --format='%an <%ae>%n%cn <%ce>%n%B' "$BASE..$HEAD" > commits.txt
+          git -C repo diff --unified=0 "$BASE...$HEAD" | grep -E '^\+[^+]' | sed 's/^+//' > added.txt || true
+          wc -l pr.txt commits.txt added.txt
+      - name: Scan
+        env:
+          PUBLICATION_DENYLIST: ${{ secrets.PUBLICATION_DENYLIST }}
+        run: python3 .org/scripts/publication_check.py pr.txt commits.txt added.txt
